@@ -1,11 +1,11 @@
 
         var options_default = { 
-        yaxis: { min: 0, max: 50000000 },
+        yaxis: { min: 0},
         xaxis: { mode: "time", timeformat: "%H:%M:%S"},
                    
           series: {
             lines: { show: true, fillColor: "rgba(166,225,38,0.7)", lineWidth: 1 },
-   //       points: { show: true, fill: true, fillColor: "rgba(202,0,204,0.7)", radius: 1 },
+            points: { show: true, fill: true, fillColor: "rgba(202,0,204,0.7)", radius: 1 },
             shadowSize: 0
           },  
                                

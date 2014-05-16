@@ -62,8 +62,6 @@ var sendFaye = function (mon) {
 
 // SSH (talk to the ubus on a single node)
 
-var rxSSH;
-
 var mon = {
   hardware: {},
   system: {},
@@ -77,7 +75,22 @@ var ssh = new SSH({
     pass: 'fm1204'
 });
 
-ssh
+ssh.on('end', function(){
+  var now = new Date();
+  mon.date = now.toJSON();
+  console.log('[SSH]---------- connection closed');
+  bayeux.getClient().publish('/ssh', JSON.stringify(mon));
+});
+
+ssh.on('error', function(err) {
+    console.log('[SSH]---------- error connection failure');
+    //console.log(err);
+    //ssh.reset();
+});
+
+var sshPull = setInterval(function () {
+console.log('[SSH]---------- polling data');
+ ssh
   .exec("ubus -v call system board", {
     out: function(rxSSH) {
       try {
@@ -111,10 +124,5 @@ ssh
     }
   })
 .start();
+}, 20000); // run poll 1 every 30 seconds
 
-ssh.on('end', function(){
-  var now = new Date();
-  mon.date = now;
-  console.log('[SSH]---------- connection closed');
-  bayeux.getClient().publish('/ssh', JSON.stringify(mon));
-});
