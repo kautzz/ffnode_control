@@ -67,7 +67,8 @@ var rxSSH;
 var mon = {
   hardware: {},
   system: {},
-  adhoc: {}
+  adhoc: {},
+  date: {}
 }
 
 var ssh = new SSH({
@@ -79,28 +80,41 @@ var ssh = new SSH({
 ssh
   .exec("ubus -v call system board", {
     out: function(rxSSH) {
-      mon.hardware = rxSSH;
+      try {
+        mon.hardware = JSON.parse(rxSSH);
+      } catch (e) {
+        console.log('[ERR]---------- error parsing hardware data');
+      }
       console.log(mon.hardware);
     }
   })
 
   .exec("ubus -v call system info", {
     out: function(rxSSH) {
-      mon.system = rxSSH;
+      try {
+        mon.system = JSON.parse(rxSSH);
+      } catch (e) {
+        console.log('[ERR]---------- error parsing system data');
+      }
       console.log(mon.system);
     }
   })
 
   .exec("ubus -v call network.device status '{ \"name\": \"wlan0\" }'", {
     out: function(rxSSH) {
-      mon.adhoc = rxSSH;
-      console.log(mon.adhoc)
+      try {
+        mon.adhoc = JSON.parse(rxSSH);
+      } catch (e) {
+        console.log('[ERR]---------- error parsing adhoc data');
+      }
+      console.log(mon.adhoc);
     }
   })
 .start();
 
 ssh.on('end', function(){
-
-  console.log('aaaaaaaaaaaaaaalert');
+  var now = new Date();
+  mon.date = now;
+  console.log('[SSH]---------- connection closed');
   bayeux.getClient().publish('/ssh', JSON.stringify(mon));
 });
