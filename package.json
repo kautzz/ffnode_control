@@ -1,0 +1,32 @@
+{
+  "name": "ffnode_control",
+  "version": "0.0.1",
+  "description": "freifunk monitoring and administration framework based on nodejs and ubus",
+  "main": "server.js",
+  "dependencies": {
+    "faye": "~1.0.1",
+    "simple-ssh": "~0.7.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kautzz/ffnode_control.git"
+  },
+  "keywords": [
+    "freifunk",
+    "nodejs",
+    "ubus",
+    "monitoring",
+    "administration"
+  ],
+  "author": "Bernd Naumann, Martin Breuer",
+  "license": "GPLv2",
+  "bugs": {
+    "url": "https://github.com/kautzz/ffnode_control/issues"
+  },
+  "homepage": "https://github.com/kautzz/ffnode_control"
+}
