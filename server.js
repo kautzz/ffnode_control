@@ -65,11 +65,25 @@ var ssh = new SSH({
     pass: 'admin'
 });
 
-ssh.exec('ubus -v call system board', {
-  out: function(stdout) {
-    rxSSH = stdout;
-    console.log(rxSSH);
-    bayeux.getClient().publish('/ssh', rxSSH);
-  }
-}).start();
+ssh
+  .exec('ubus -v call system board', {
+    out: function(rxSSH) {
+      rxSSH.system = rxSSH;
+      bayeux.getClient().publish('/ssh', rxSSH.system);
+      console.log(rxSSH.system);
+    }
+  })
+
+  .exec('ubus -v call system board', {
+    out: function(rxSSH) {
+      bayeux.getClient().publish('/ssh', rxSSH);
+    }
+  })
+
+  .exec('ubus -v call system board', {
+    out: function(rxSSH) {
+      bayeux.getClient().publish('/ssh', rxSSH);
+    }
+  })
+.start();
 
