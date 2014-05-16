@@ -7,7 +7,7 @@ var SSH = require('simple-ssh');
 var faye = require('faye');
 
 
-// WEBSERVER
+// WEBSERVER (localhost/index.html)
 
 var httpserver = http.createServer(function (request, response) {
   var filePath = 'www/' + request.url;
@@ -51,39 +51,56 @@ var httpserver = http.createServer(function (request, response) {
 
 httpserver.listen(80);
 
-// FAYESERVER
+// FAYESERVER (sending stuff to clients)
 
 var bayeux = new faye.NodeAdapter({mount: '/faye', timeout: 45});
 bayeux.attach(httpserver);
 
-// SSH
+var sendFaye = function (mon) {
+  bayeux.getClient().publish('/ssh', JSON.stringify(mon));
+}
+
+// SSH (talk to the ubus on a single node)
 
 var rxSSH;
+
+var mon = {
+  hardware: {},
+  system: {},
+  adhoc: {}
+}
+
 var ssh = new SSH({
     host: '10.63.84.66',
     user: 'root',
-    pass: 'admin'
+    pass: 'fm1204'
 });
 
 ssh
-  .exec('ubus -v call system board', {
+  .exec("ubus -v call system board", {
     out: function(rxSSH) {
-      rxSSH.system = rxSSH;
-      bayeux.getClient().publish('/ssh', rxSSH.system);
-      console.log(rxSSH.system);
+      mon.hardware = rxSSH;
+      console.log(mon.hardware);
     }
   })
 
-  .exec('ubus -v call system board', {
+  .exec("ubus -v call system info", {
     out: function(rxSSH) {
-      bayeux.getClient().publish('/ssh', rxSSH);
+      mon.system = rxSSH;
+      console.log(mon.system);
     }
   })
 
-  .exec('ubus -v call system board', {
+  .exec("ubus -v call network.device status '{ \"name\": \"wlan0\" }'", {
     out: function(rxSSH) {
-      bayeux.getClient().publish('/ssh', rxSSH);
+      mon.adhoc = rxSSH;
+      console.log(mon.adhoc)
     }
   })
 .start();
 
+ssh.on('end', function(){
+
+  console.log('aaaaaaaaaaaaaaalert');
+  bayeux.getClient().publish('/ssh', JSON.stringify(mon));
+});
